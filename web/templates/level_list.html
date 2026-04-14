@@ -1,0 +1,179 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <style>
+        /* ================= 页面原有样式 ================= */
+        .container { max-width: 1000px; margin: 0 auto; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-title { font-size: 24px; font-weight: 600; color: #111827; }
+
+        .btn-add { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25); transition: all 0.3s ease; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(102, 126, 234, 0.35); }
+
+        .card { background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f9fafb; padding: 16px 24px; font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 16px 24px; font-size: 15px; color: #374151; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+        tbody tr:hover { background-color: #f8fafc; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .badge { background-color: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+
+        .action-btns { display: flex; gap: 12px; }
+        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: none; cursor: pointer; }
+        .btn-edit { color: #2563eb; background-color: #eff6ff; }
+        .btn-edit:hover { background-color: #dbeafe; }
+        .btn-delete { color: #dc2626; background-color: #fef2f2; }
+        .btn-delete:hover { background-color: #fee2e2; }
+        .empty-state { text-align: center; padding: 40px; color: #9ca3af; font-size: 15px; }
+
+
+        /* ================= 新增：SweetAlert2 自定义美化样式 ================= */
+
+        /* 弹窗主体：更大的圆角和更柔和的阴影 */
+        .my-swal-popup {
+            border-radius: 20px !important;
+            padding: 2em !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid #f3f4f6 !important;
+        }
+
+        /* 标题字体加粗，颜色加深 */
+        .my-swal-title {
+            font-size: 22px !important;
+            color: #111827 !important;
+            font-weight: 600 !important;
+            margin-bottom: 10px !important;
+        }
+
+        /* 文本说明颜色变淡 */
+        .my-swal-content {
+            color: #4b5563 !important;
+            font-size: 15px !important;
+        }
+
+        /* 确认按钮：套用你的紫蓝渐变高级效果 */
+        .my-swal-confirm-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.25) !important;
+            padding: 10px 24px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            margin-left: 15px !important; /* 拉开两个按钮的间距 */
+            transition: all 0.3s ease !important;
+        }
+
+        .my-swal-confirm-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.35) !important;
+        }
+
+        /* 取消按钮：低调的高级灰 */
+        .my-swal-cancel-btn {
+            background-color: #f3f4f6 !important;
+            color: #4b5563 !important;
+            padding: 10px 24px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .my-swal-cancel-btn:hover {
+            background-color: #e5e7eb !important;
+            color: #111827 !important;
+        }
+    </style>
+
+    <div class="container">
+        <div class="page-header">
+            <h2 class="page-title">级别管理</h2>
+            <a href="{% url 'level_add' %}" class="btn-add">
+                <i class="fas fa-plus"></i> 新建级别
+            </a>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>级别名称</th>
+                        <th>折扣力度</th>
+                        <th style="width: 200px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in queryset %}
+                    <tr>
+                        <td>{{ obj.title }}</td>
+                        <td><span class="badge">{{ obj.percent }}%</span></td>
+                        <td class="action-btns">
+                            <a href="{% url 'level_edit' pk=obj.id %}" class="btn-sm btn-edit">
+                                <i class="fas fa-edit"></i> 编辑
+                            </a>
+                            <a href="javascript:void(0);"
+                               data-url="{% url 'level_delete' pk=obj.id %}"
+                               data-name="{{ obj.title }}"
+                               class="btn-sm btn-delete btn-delete-confirm">
+                                <i class="fas fa-trash"></i> 删除
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox fa-2x" style="margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>暂无任何级别数据，请点击右上角添加。</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.btn-delete-confirm');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const deleteUrl = this.getAttribute('data-url');
+                    const levelName = this.getAttribute('data-name');
+
+                    Swal.fire({
+                        title: '确定要删除吗？',
+                        text: `您正在尝试删除级别【${levelName}】，此操作不可撤销！`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-check" style="margin-right:5px"></i>确定删除',
+                        cancelButtonText: '取消',
+                        reverseButtons: true,
+
+                        // 核心：禁用默认的自带按钮样式
+                        buttonsStyling: false,
+
+                        // 挂载我们上面写的 CSS 类名
+                        customClass: {
+                            popup: 'my-swal-popup',
+                            title: 'my-swal-title',
+                            htmlContainer: 'my-swal-content',
+                            confirmButton: 'my-swal-confirm-btn',
+                            cancelButton: 'my-swal-cancel-btn'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = deleteUrl;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

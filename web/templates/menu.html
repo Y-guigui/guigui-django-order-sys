@@ -1,0 +1,66 @@
+<style>
+    /* 菜单项的基础样式 (现代化 SaaS 风格) */
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        color: #6b7280; /* 默认文字颜色稍微浅一点，显得高级 */
+        text-decoration: none;
+        border-radius: 10px; /* 圆角更加平滑 */
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 统一图标的占位和颜色 */
+    .menu-item i {
+        margin-right: 12px;
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+        color: #9ca3af; /* 默认图标颜色为浅灰 */
+        transition: all 0.2s ease;
+    }
+
+    /* 鼠标悬浮时的轻微互动效果 */
+    .menu-item:hover {
+        background-color: #f9fafb;
+        color: #111827;
+        transform: translateX(4px);
+    }
+    .menu-item:hover i {
+        color: #667eea; /* 悬浮时，只有图标变成品牌紫蓝色 */
+    }
+
+    /* 核心！被选中的高亮样式 (改用浅色背景 + 文字变色) */
+    .menu-item.active {
+        background-color: #eef2ff; /* 极浅的紫蓝色背景 */
+        color: #4f46e5; /* 字体变成主色调 */
+        font-weight: 600;
+    }
+    .menu-item.active i {
+        color: #4f46e5; /* 图标也变为主色调 */
+    }
+
+    /* 绝杀细节：在左侧加上一条漂亮的渐变指示线 */
+    .menu-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        height: 60%;
+        width: 4px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0 4px 4px 0;
+    }
+</style>
+
+{% for item in menu_list %}
+    <a href="{{ item.url }}" class="menu-item {{ item.class }}">
+        <i class="{{ item.icon|default:'fas fa-cube' }}"></i>
+        <span>{{ item.text }}</span>
+    </a>
+{% endfor %}
