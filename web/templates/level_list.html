@@ -99,6 +99,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>级别名称</th>
                         <th>折扣力度</th>
                         <th style="width: 200px;">操作</th>
@@ -107,6 +108,7 @@
                 <tbody>
                     {% for obj in queryset %}
                     <tr>
+                        <td>{{ obj.id }}</td>
                         <td>{{ obj.title }}</td>
                         <td><span class="badge">{{ obj.percent }}%</span></td>
                         <td class="action-btns">

@@ -15,18 +15,22 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path
-from web.views import account, level
+from web.views import account, level, customer
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('login/', account.login, name='login'),
     path('sms/login/', account.sms_login, name='sms_login'),
     path('sms/send/', account.sms_send, name='sms_send'),
+
+
     path('level/list/', level.level_list, name='level_list'),
     path('level/add/', level.level_add, name='level_add'),
     path('level/edit/<int:pk>/', level.level_edit, name='level_edit'),
     path('level/delete/<int:pk>/', level.level_delete, name='level_delete'),
 
+
+    path('customer/list/', customer.customer_list, name='customer_list'),
 
 
 

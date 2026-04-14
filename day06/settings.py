@@ -182,6 +182,7 @@ NB_PERMISSION = {
         "level_add": "添加级别",
         "level_edit": "级别编辑",
         "level_delete": "级别删除",
+        "customer_list":"用户列表",
     },
     "CUSTOMER": {
         "level_list": "级别列表",
@@ -195,7 +196,7 @@ NB_MENU = {
         # 给级别管理配一个皇冠图标
         {"text": "级别管理", "url": "/level/list/", "icon": "fas fa-crown"},
         # 给用户管理配一个人群图标
-        {"text": "用户管理", "url": "/xxx/xx/", "icon": "fas fa-users"},
+        {"text": "用户管理", "url": "/customer/list/", "icon": "fas fa-users"},
         # 给订单管理配一个清单图标
         {"text": "订单管理", "url": "/xxx/xx/", "icon": "fas fa-clipboard-list"},
     ],

@@ -33,3 +33,11 @@ from utils.encrypt import md5
 #     level_id = 1,
 #     creator_id = 1
 # )
+
+# models.Customer.objects.create(
+#     username='wangwu',
+#     password=md5('wangwu'),  # 假设 md5 函数接收一个字符串并返回其 MD5 加密后的值
+#     mobile='19999999997',
+#     level_id = 10,
+#     creator_id = 1
+# )
