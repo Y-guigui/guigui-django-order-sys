@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from web import models
 from .forms import LevelModelForm
+from django.http import JsonResponse
 
 
 def level_list(request):
