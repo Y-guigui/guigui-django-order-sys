@@ -51,6 +51,8 @@ def level_delete(request, pk):
     """
     删除级别
     """
-    # 找到对应的记录并删除
-    models.Level.objects.filter(id=pk).delete()
+    exists = models.Customer.objects.filter(level_id=pk).exists()
+    if not exists:
+        # 找到对应的记录并删除
+        models.Level.objects.filter(id=pk).delete()
     return redirect('/level/list/')

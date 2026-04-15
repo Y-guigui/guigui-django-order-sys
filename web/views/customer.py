@@ -8,6 +8,6 @@ from .forms import LoginForm, SmsLoginForm
 
 def customer_list(request):
     # 1. 从数据库中获取所有级别数据
-    queryset = models.Customer.objects.all()
+    queryset = models.Customer.objects.filter(active=1)
     # 2. 渲染模板，并将数据传过去
     return render(request, 'customer_list.html', {'queryset': queryset})
