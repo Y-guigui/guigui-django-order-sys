@@ -171,7 +171,20 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = deleteUrl;
+                            // 使用 fetch 发送 GET 请求
+                            fetch(deleteUrl)
+                                .then(response => response.json())
+                                .then(res => {
+                                    if (res.status) {
+                                        // 删除成功，再刷新页面
+                                        Swal.fire('已删除!', '该级别已被成功删除。', 'success').then(() => {
+                                            location.reload();
+                                        });
+                                    } else {
+                                        // 删除失败，弹出后端返回的错误提示
+                                        Swal.fire('删除失败', res.error, 'error');
+                                    }
+                                });
                         }
                     });
                 });

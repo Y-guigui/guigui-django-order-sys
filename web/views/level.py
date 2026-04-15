@@ -48,11 +48,13 @@ def level_edit(request, pk):
     return render(request, 'level_edit.html', {'form': form})
 
 def level_delete(request, pk):
-    """
-    删除级别
-    """
+    """ 删除级别 (Ajax版本) """
     exists = models.Customer.objects.filter(level_id=pk).exists()
-    if not exists:
-        # 找到对应的记录并删除
-        models.Level.objects.filter(id=pk).delete()
-    return redirect('/level/list/')
+
+    if exists:
+        # 如果存在关联客户，返回错误信息
+        return JsonResponse({"status": False, "error": "该级别下还有关联客户，无法删除！"})
+
+    # 如果没有关联，执行删除
+    models.Level.objects.filter(id=pk).delete()
+    return JsonResponse({"status": True})
