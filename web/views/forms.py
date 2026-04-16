@@ -111,13 +111,8 @@ class CustomerForm(BootStrapForm, forms.ModelForm):
 
     # 专门针对 mobile 字段的局部校验钩子
     def clean_mobile(self):
-        # 1. 获取用户提交的手机号
         mobile = self.cleaned_data.get('mobile')
         # 2. 去数据库查询是否已经存在 active=1 的该手机号
-         # 注意这里有一个非常高级的细节：
-        # 我们要判断 self.instance.pk 是否存在。
-        # 因为如果你以后把这个 Form 也用在“编辑客户”功能上，
-        # 不排除当前客户自己的 ID 会导致误判（自己跟自己重复）。
         queryset = models.Customer.objects.filter(mobile=mobile, active=1)
         if self.instance.pk:
             # 如果是编辑操作，把当前正在编辑的这个客户自己排除掉
@@ -127,6 +122,15 @@ class CustomerForm(BootStrapForm, forms.ModelForm):
             raise ValidationError("该手机号已经被注册使用了！")
         # 4. 如果没问题，必须把原数据返回
         return mobile
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        queryset = models.Customer.objects.filter(username=username, active=1)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise ValidationError("该用户名已经被注册使用了！")
+        return username
 
     def clean(self):
          # 先获取父类提取到的所有清洗后的数据
@@ -141,5 +145,32 @@ class CustomerForm(BootStrapForm, forms.ModelForm):
                 self.add_error("confirm_password", "两次输入的密码不一致！")
             else:
                 cleaned_data["password"] = md5(pwd)
-
         return cleaned_data
+
+class CustomerEditForm(BootStrapForm, forms.ModelForm):
+
+    class Meta:
+        model = models.Customer
+        fields = ['username', 'mobile', 'level']
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['level'].empty_label = "请选择客户级别"
+
+        # 依然保留手机号查重的功能，防止他改成别人的手机号
+        def clean_mobile(self):
+            mobile = self.cleaned_data.get('mobile')
+            # 排除自己的 ID，去查有没有别人用这个手机号
+            queryset = models.Customer.objects.filter(mobile=mobile, active=1).exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise ValidationError("该手机号已经被其他客户使用了！")
+            return mobile
+
+        def clean_username(self):
+            username = self.cleaned_data.get('username')
+            queryset = models.Customer.objects.filter(username=username, active=1)
+            if self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise ValidationError("该用户名已经被注册使用了！")
+            return username
