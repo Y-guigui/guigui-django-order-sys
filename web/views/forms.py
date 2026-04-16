@@ -1,6 +1,7 @@
 from django import forms
 from web import models
 from django.core.exceptions import ValidationError
+from utils.encrypt import md5
 
 
 class BootStrapForm(object):
@@ -81,3 +82,64 @@ class LevelModelForm(forms.ModelForm):
                 raise ValidationError("折扣比例必须在 0 到 100 之间呀")
 
         return percent
+
+
+class CustomerForm(BootStrapForm, forms.ModelForm):
+    confirm_password = forms.CharField(
+        label="确认密码",
+        widget=forms.PasswordInput(render_value=True), # render_value=True 保证校验失败时密码不会被清空
+        error_messages = {'required': '请再次确认密码'}
+    )
+    class Meta:
+        model = models.Customer
+        fields = ['username', 'mobile', 'password', 'confirm_password', 'level']
+        # 把原生的 password 字段也变成密码输入框
+        widgets = {
+            'password': forms.PasswordInput(render_value=True)
+        }
+        error_messages = {
+            'username': {'required': '用户名不能为空'},
+            'mobile': {'required': '手机号不能为空'},
+            'password': {'required': '密码不能为空'},
+            'level': {'required': '请选择客户所属级别'},
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 拦截 Django 默认的 "---------"
+        self.fields['level'].empty_label = "请选择客户级别"
+
+    # 专门针对 mobile 字段的局部校验钩子
+    def clean_mobile(self):
+        # 1. 获取用户提交的手机号
+        mobile = self.cleaned_data.get('mobile')
+        # 2. 去数据库查询是否已经存在 active=1 的该手机号
+         # 注意这里有一个非常高级的细节：
+        # 我们要判断 self.instance.pk 是否存在。
+        # 因为如果你以后把这个 Form 也用在“编辑客户”功能上，
+        # 不排除当前客户自己的 ID 会导致误判（自己跟自己重复）。
+        queryset = models.Customer.objects.filter(mobile=mobile, active=1)
+        if self.instance.pk:
+            # 如果是编辑操作，把当前正在编辑的这个客户自己排除掉
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            # 3. 如果查到了，抛出错误，这个错误会显示在前端输入框下方
+            raise ValidationError("该手机号已经被注册使用了！")
+        # 4. 如果没问题，必须把原数据返回
+        return mobile
+
+    def clean(self):
+         # 先获取父类提取到的所有清洗后的数据
+        cleaned_data = super().clean()
+        # 拿到两次输入的密码
+        pwd = cleaned_data.get("password")
+        confirm_pwd = cleaned_data.get("confirm_password")
+        # 校验
+        if pwd and confirm_pwd:
+            if pwd != confirm_pwd:
+                # 主动抛出错误，并将错误绑定到 confirm_password 字段下
+                self.add_error("confirm_password", "两次输入的密码不一致！")
+            else:
+                cleaned_data["password"] = md5(pwd)
+
+        return cleaned_data

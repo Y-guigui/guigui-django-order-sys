@@ -3,35 +3,62 @@
 {% block content %}
     <style>
         /* ================= 页面原有样式 ================= */
-        .container { max-width: 1200px; margin: 0 auto; } /* 客户信息较多，稍微加宽了容器 */
+        .container { max-width: 1200px; margin: 0 auto; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .page-title { font-size: 24px; font-weight: 600; color: #111827; }
 
-        .btn-add { background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.25); transition: all 0.3s ease; }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(40, 167, 69, 0.35); }
+        /* 新建按钮：统一为紫蓝渐变 */
+        .btn-add { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25); transition: all 0.3s ease; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(102, 126, 234, 0.35); }
 
         .card { background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background-color: #f9fafb; padding: 16px 20px; font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb; }
-        td { padding: 16px 20px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+
+        /* 【优化点 1】内边距调整为 24px，增加呼吸感 */
+        th { background-color: #f9fafb; padding: 16px 24px; font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 16px 24px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+
         tbody tr:hover { background-color: #f8fafc; }
         tbody tr:last-child td { border-bottom: none; }
 
-        .action-btns { display: flex; gap: 8px; }
-        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: none; cursor: pointer; }
-        .btn-edit { color: white; background-color: #3b82f6; }
-        .btn-edit:hover { background-color: #2563eb; }
-        .btn-delete { color: white; background-color: #ef4444; }
-        .btn-delete:hover { background-color: #dc2828; }
+        /* 级别的徽章样式 */
+        .badge { background-color: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+
+        /* ================= 操作按钮样式 ================= */
+        .action-btns {
+            display: flex;
+            gap: 12px; /* 【优化点 2】间距增加到 12px，不再拥挤 */
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            background-color: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-edit { color: #667eea; }
+        .btn-edit:hover { background-color: #f5f3ff; color: #5b21b6; border-color: #ede9fe; }
+
+        .btn-delete { color: #ef4444; }
+        .btn-delete:hover { background-color: #fef2f2; color: #dc2626; border-color: #fee2e2; }
 
         .empty-state { text-align: center; padding: 40px; color: #9ca3af; font-size: 15px; }
 
-        /* ================= SweetAlert2 自定义美化样式 ================= */
+        /* ================= SweetAlert2 美化 ================= */
         .my-swal-popup { border-radius: 20px !important; padding: 2em !important; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important; border: 1px solid #f3f4f6 !important; }
         .my-swal-title { font-size: 22px !important; color: #111827 !important; font-weight: 600 !important; margin-bottom: 10px !important; }
         .my-swal-content { color: #4b5563 !important; font-size: 15px !important; }
-        .my-swal-confirm-btn { background: linear-gradient(135deg, #ef4444 0%, #dc2828 100%) !important; color: white !important; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25) !important; padding: 10px 24px !important; border-radius: 8px !important; font-size: 14px !important; font-weight: 600 !important; margin-left: 15px !important; transition: all 0.3s ease !important; }
-        .my-swal-confirm-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 15px rgba(239, 68, 68, 0.35) !important; }
+        .my-swal-confirm-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.25) !important; padding: 10px 24px !important; border-radius: 8px !important; font-size: 14px !important; font-weight: 600 !important; margin-left: 15px !important; transition: all 0.3s ease !important; }
+        .my-swal-confirm-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 15px rgba(102, 126, 234, 0.35) !important; }
         .my-swal-cancel-btn { background-color: #f3f4f6 !important; color: #4b5563 !important; padding: 10px 24px !important; border-radius: 8px !important; font-size: 14px !important; font-weight: 600 !important; transition: all 0.3s ease !important; }
         .my-swal-cancel-btn:hover { background-color: #e5e7eb !important; color: #111827 !important; }
     </style>
@@ -39,8 +66,8 @@
     <div class="container">
         <div class="page-header">
             <h2 class="page-title">客户列表</h2>
-            <a href="{% url 'level_add' %}" class="btn-add">
-                <i class="fas fa-plus-circle"></i> 新建
+            <a href="{% url 'customer_add' %}" class="btn-add">
+                <i class="fas fa-plus"></i> 新建客户
             </a>
         </div>
 
@@ -55,7 +82,7 @@
                         <th>级别</th>
                         <th>注册时间</th>
                         <th>创建者</th>
-                        <th style="width: 160px;">操作</th>
+                        <th style="width: 200px;">操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,20 +91,20 @@
                         <td>{{ obj.id }}</td>
                         <td>{{ obj.username }}</td>
                         <td>{{ obj.mobile }}</td>
-                        <td>{{ obj.balance|floatformat:2 }}</td>
-                        <td>{{ obj.level.title }} ({{ obj.level.percent }}%)</td>
+                        <td style="font-weight: 600; color: #059669;">¥ {{ obj.balance|floatformat:2 }}</td>
+                        <td><span class="badge">{{ obj.level.title }} ({{ obj.level.percent }}%)</span></td>
                         <td>{{ obj.create_date|date:"Y年m月d日 H:i" }}</td>
                         <td>{{ obj.creator.username }}</td>
 
                         <td class="action-btns">
-                            <a href="{% url 'level_edit' pk=obj.id %}" class="btn-sm btn-edit">
-                                编辑
+                            <a href="{% url 'customer_delete' pk=obj.id %}" class="btn-sm btn-edit">
+                                <i class="fas fa-edit"></i> 编辑
                             </a>
                             <a href="javascript:void(0);"
-                               data-url="{% url 'level_delete' pk=obj.id %}"
+                               data-url="{% url 'customer_delete' pk=obj.id %}"
                                data-name="{{ obj.username }}"
                                class="btn-sm btn-delete btn-delete-confirm">
-                                删除
+                                <i class="fas fa-trash"></i> 删除
                             </a>
                         </td>
                     </tr>
@@ -112,7 +139,7 @@
                         text: `您正在尝试删除客户【${customerName}】，此操作不可撤销！`,
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: '确定删除',
+                        confirmButtonText: '<i class="fas fa-check" style="margin-right:5px"></i>确定删除',
                         cancelButtonText: '取消',
                         reverseButtons: true,
                         buttonsStyling: false,
@@ -125,7 +152,16 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = deleteUrl;
+                            // 调用你写好的软删除接口
+                            fetch(deleteUrl)
+                                .then(response => response.json())
+                                .then(res => {
+                                    if (res.status) {
+                                        Swal.fire('已删除!', '该客户已删除!', 'success').then(() => {
+                                            location.reload();
+                                        });
+                                    }
+                                });
                         }
                     });
                 });

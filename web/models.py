@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 
 
 class ActiveBaseModel(models.Model):
@@ -15,11 +16,19 @@ class Administrator(ActiveBaseModel):
     mobile = models.CharField(verbose_name="手机号", max_length=11, db_index=True)
     create_date = models.DateTimeField(verbose_name="创建日期", auto_now_add=True)
 
+    # 【新增这个方法】让下拉框显示管理员的用户名
+    def __str__(self):
+        return self.username
+
 
 class Level(ActiveBaseModel):
     """ 级别表 """
     title = models.CharField(verbose_name="标题", max_length=32)
     percent = models.IntegerField(verbose_name="折扣")
+
+    # 【新增这个方法】让下拉框显示 级别名称 (折扣力度)
+    def __str__(self):
+        return f"{self.title} ({self.percent}%)"
 
 
 class Customer(ActiveBaseModel):
@@ -31,6 +40,16 @@ class Customer(ActiveBaseModel):
     level = models.ForeignKey(verbose_name="级别", to="Level", on_delete=models.CASCADE)
     create_date = models.DateTimeField(verbose_name="创建日期", auto_now_add=True)
     creator = models.ForeignKey(verbose_name="创建者", to="Administrator", on_delete=models.CASCADE)
+
+    # Meta 类，定义条件唯一约束
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['mobile'],  # 针对手机号字段
+                condition=Q(active=1),  # 仅在 active=1 (活跃状态) 时生效
+                name='unique_active_mobile'  # 给这个约束起个名字，数据库里会显示这个名字
+            )
+        ]
 
 
 class PricePolicy(models.Model):

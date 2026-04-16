@@ -179,10 +179,13 @@ NB_WHITE_URL = ['/login/', '/sms/login/', '/sms/send/']
 NB_PERMISSION = {
     "ADMIN": {
         "level_list": "级别列表",
-        "level_add": "添加级别",
+        "level_add": "级别添加",
         "level_edit": "级别编辑",
         "level_delete": "级别删除",
         "customer_list":"用户列表",
+        "customer_add":"用户添加",
+        "customer_edit":"用户编辑",
+        "customer_delete":"用户删除",
     },
     "CUSTOMER": {
         "level_list": "级别列表",

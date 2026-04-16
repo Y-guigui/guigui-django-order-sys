@@ -6,7 +6,7 @@ from django.http import JsonResponse
 
 def level_list(request):
     # 1. 从数据库中获取所有级别数据
-    queryset = models.Level.objects.all()
+    queryset = models.Level.objects.filter(active=1)
     # 2. 渲染模板，并将数据传过去
     return render(request, 'level_list.html', {'queryset': queryset})
 
@@ -24,7 +24,7 @@ def level_add(request):
         # models.Level.objects.create(**form.cleaned_data)
         form.save()
         # 保存成功后跳转回列表页
-        return redirect('/level/list')
+        return redirect('/level/list/')
 
     # 验证失败，带着错误信息返回原页面
     return render(request, 'level_add.html', {'form':form})
@@ -33,7 +33,7 @@ def level_edit(request, pk):
     row_object = models.Level.objects.filter(id=pk).first()
 
     if not row_object:
-        return redirect('/level/list')
+        return redirect('/level/list/')
 
     if request.method == 'GET':
         form = LevelModelForm(instance=row_object)
@@ -57,5 +57,5 @@ def level_delete(request, pk):
         return JsonResponse({"status": False, "error": "该级别下还有关联客户，无法删除！"})
 
     # 如果没有关联，执行删除
-    models.Level.objects.filter(id=pk).delete()
+    models.Level.objects.filter(id=pk).update(active=0)
     return JsonResponse({"status": True})
