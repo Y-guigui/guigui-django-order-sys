@@ -186,6 +186,11 @@ NB_PERMISSION = {
         "customer_add":"用户添加",
         "customer_edit":"用户编辑",
         "customer_delete":"用户删除",
+        "policy_list":"价格策略列表",
+        "policy_add":"价格策略添加",
+        "policy_delete":"价格策略删除",
+        "policy_edit":"价格策略编辑",
+
     },
     "CUSTOMER": {
         "level_list": "级别列表",
@@ -201,7 +206,7 @@ NB_MENU = {
         # 给用户管理配一个人群图标
         {"text": "用户管理", "url": "/customer/list/", "icon": "fas fa-users"},
         # 给订单管理配一个清单图标
-        {"text": "订单管理", "url": "/xxx/xx/", "icon": "fas fa-clipboard-list"},
+        {"text": "价格策略", "url": "/policy/list/", "icon": "fas fa-clipboard-list"},
     ],
     "CUSTOMER": [
         {"text": "我的订单", "url": "/xxx/xx/", "icon": "fas fa-shopping-cart"},

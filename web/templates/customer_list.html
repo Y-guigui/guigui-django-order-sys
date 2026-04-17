@@ -25,31 +25,16 @@
         .badge { background-color: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
 
         /* ================= 操作按钮样式 ================= */
-        .action-btns {
-            display: flex;
-            gap: 12px; /* 【优化点 2】间距增加到 12px，不再拥挤 */
-        }
+        .action-btns { display: flex; gap: 12px; }
+        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: none; cursor: pointer; }
 
-        .btn-sm {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
-            background-color: transparent;
-            border: 1px solid transparent;
-            cursor: pointer;
-        }
+        /* 编辑按钮：浅蓝底 + 深蓝字 */
+        .btn-edit { color: #2563eb; background-color: #eff6ff; }
+        .btn-edit:hover { background-color: #dbeafe; }
 
-        .btn-edit { color: #667eea; }
-        .btn-edit:hover { background-color: #f5f3ff; color: #5b21b6; border-color: #ede9fe; }
-
-        .btn-delete { color: #ef4444; }
-        .btn-delete:hover { background-color: #fef2f2; color: #dc2626; border-color: #fee2e2; }
+        /* 删除按钮：浅红底 + 深红字 */
+        .btn-delete { color: #dc2626; background-color: #fef2f2; }
+        .btn-delete:hover { background-color: #fee2e2; }
 
         .empty-state { text-align: center; padding: 40px; color: #9ca3af; font-size: 15px; }
 

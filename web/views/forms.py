@@ -174,3 +174,39 @@ class CustomerEditForm(BootStrapForm, forms.ModelForm):
         if queryset.exists():
             raise ValidationError("该用户名已经被注册使用了！")
         return username
+
+
+
+class PolicyModelForm(forms.ModelForm):
+    class Meta:
+        model = models.PricePolicy
+        fields = ['count', 'price']
+        # 同样，为了保持我们高级的 UI 风格，注入 CSS 样式
+        widgets = {
+            'count': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '请输入产品数量'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '请输入产品价格', 'step': '0.01'}),
+        }
+        # 自定义中文报错信息
+        error_messages = {
+            'count': {
+                'required': '产品数量不能为空',
+                'invalid': '请输入有效的整数',
+            },
+            'price': {
+                'required': '产品价格不能为空',
+                'invalid': '请输入有效的产品价格（最多两位小数）',
+            }
+        }
+
+    def clean_count(self):
+        count = self.cleaned_data.get('count')
+        queryset = models.PricePolicy.objects.filter(count=count)
+
+        # 排除自己,exclude pk = self.instance.pk
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise ValidationError("该数量的价格策略已存在，请换一个数量！")
+        return count
+
