@@ -7,8 +7,6 @@ from django.shortcuts import render, redirect
 from .forms import LoginForm, SmsLoginForm
 
 
-
-
 def login(request):
     if request.method == 'GET':
         # GET请求：实例化一个干干净净的空表单
@@ -43,7 +41,7 @@ def login(request):
                 'name': user_object.username,
                 'id': user_object.id
             }
-            return redirect("/level/list")
+            return redirect("/level/list/")
 
         # 校验失败：查无此人或密码错误。通过 add_error 附加一个全局错误
         form.add_error(None, "用户名或密码错误")

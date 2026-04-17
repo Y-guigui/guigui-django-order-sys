@@ -1,6 +1,10 @@
 {% extends 'layout.html' %}
 
+{% load permission %}
+
 {% block content %}
+    {% is_admin as is_admin_flag %}
+
     <style>
         /* ================= 页面原有样式 ================= */
         .container { max-width: 1000px; margin: 0 auto; }
@@ -97,9 +101,11 @@
     <div class="container">
         <div class="page-header">
             <h2 class="page-title">级别管理</h2>
-            <a href="{% url 'level_add' %}" class="btn-add">
-                <i class="fas fa-plus"></i> 新建级别
-            </a>
+            {% if is_admin_flag %}
+                <a href="{% url 'level_add' %}" class="btn-add">
+                    <i class="fas fa-plus"></i> 新建级别
+                </a>
+            {% endif %}
         </div>
 
         <div class="card">
@@ -109,7 +115,9 @@
                         <th>ID</th>
                         <th>级别名称</th>
                         <th>折扣力度</th>
-                        <th style="width: 200px;">操作</th>
+                        {% if is_admin_flag %}
+                            <th style="width: 200px;">操作</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -118,21 +126,23 @@
                         <td>{{ obj.id }}</td>
                         <td>{{ obj.title }}</td>
                         <td><span class="badge">{{ obj.percent }}%</span></td>
-                        <td class="action-btns">
-                            <a href="{% url 'level_edit' pk=obj.id %}" class="btn-sm btn-edit">
-                                <i class="fas fa-edit"></i> 编辑
-                            </a>
-                            <a href="javascript:void(0);"
-                               data-url="{% url 'level_delete' pk=obj.id %}"
-                               data-name="{{ obj.title }}"
-                               class="btn-sm btn-delete btn-delete-confirm">
-                                <i class="fas fa-trash"></i> 删除
-                            </a>
-                        </td>
+                        {% if is_admin_flag %}
+                            <td class="action-btns">
+                                <a href="{% url 'level_edit' pk=obj.id %}" class="btn-sm btn-edit">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </a>
+                                <a href="javascript:void(0);"
+                                   data-url="{% url 'level_delete' pk=obj.id %}"
+                                   data-name="{{ obj.title }}"
+                                   class="btn-sm btn-delete btn-delete-confirm">
+                                    <i class="fas fa-trash"></i> 删除
+                                </a>
+                            </td>
+                        {% endif %}
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3">
+                        <td colspan="{% if is_admin_flag %}4{% else %}3{% endif %}">
                             <div class="empty-state">
                                 <i class="fas fa-inbox fa-2x" style="margin-bottom: 10px; opacity: 0.5;"></i>
                                 <p>暂无任何级别数据，请点击右上角添加。</p>
