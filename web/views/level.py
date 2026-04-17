@@ -7,9 +7,16 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def level_list(request):
 
-    data_list = models.Level.objects.filter(active=1).order_by('id')
+    q = request.GET.get('q','')
+    query_dict = {'active':1}
+    if q:
+        # 假设你的级别名称字段叫 title，如果是其他名字请替换
+        query_dict['title__contains'] = q
+
+    data_list = models.Level.objects.filter(**query_dict).order_by('id')
     paginator = Paginator(data_list, 8)
     page_number = request.GET.get('page',1)
+
     try:
         queryset = paginator.page(page_number)
     except PageNotAnInteger:
@@ -17,7 +24,10 @@ def level_list(request):
     except EmptyPage:
         queryset = paginator.page(paginator.num_pages)
 
-    return render(request, 'level_list.html', {'queryset': queryset})
+    return render(request, 'level_list.html', {
+        'queryset': queryset,
+        'keyword': q
+    })
 
 
 def level_add(request):
@@ -39,10 +49,15 @@ def level_add(request):
     return render(request, 'level_add.html', {'form':form})
 
 def level_edit(request, pk):
+
+
     row_object = models.Level.objects.filter(id=pk).first()
 
     if not row_object:
         return redirect('/level/list/')
+
+    page = request.GET.get('page', '')
+    q = request.GET.get('q', '')
 
     if request.method == 'GET':
         form = LevelModelForm(instance=row_object)
@@ -52,7 +67,7 @@ def level_edit(request, pk):
     form = LevelModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()  # 这里会自动执行 SQL 的 UPDATE 语句
-        return redirect('/level/list/')
+        return redirect(f'/level/list/?page={page}&q={q}')
 
     # 验证失败，带着错误信息返回原页面
     return render(request, 'level_edit.html', {'form': form})
