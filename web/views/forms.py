@@ -153,24 +153,24 @@ class CustomerEditForm(BootStrapForm, forms.ModelForm):
         model = models.Customer
         fields = ['username', 'mobile', 'level']
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['level'].empty_label = "请选择客户级别"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 将 empty_label 设置为 None，Django 就会直接渲染实际的级别数据，彻底去掉空选项
+        self.fields['level'].empty_label = None
 
-        # 依然保留手机号查重的功能，防止他改成别人的手机号
-        def clean_mobile(self):
-            mobile = self.cleaned_data.get('mobile')
-            # 排除自己的 ID，去查有没有别人用这个手机号
-            queryset = models.Customer.objects.filter(mobile=mobile, active=1).exclude(pk=self.instance.pk)
-            if queryset.exists():
-                raise ValidationError("该手机号已经被其他客户使用了！")
-            return mobile
+    def clean_mobile(self):
+        mobile = self.cleaned_data.get('mobile')
+        # 排除自己的 ID，去查有没有别人用这个手机号
+        queryset = models.Customer.objects.filter(mobile=mobile, active=1).exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise ValidationError("该手机号已经被其他客户使用了！")
+        return mobile
 
-        def clean_username(self):
-            username = self.cleaned_data.get('username')
-            queryset = models.Customer.objects.filter(username=username, active=1)
-            if self.instance.pk:
-                queryset = queryset.exclude(pk=self.instance.pk)
-            if queryset.exists():
-                raise ValidationError("该用户名已经被注册使用了！")
-            return username
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        queryset = models.Customer.objects.filter(username=username, active=1)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise ValidationError("该用户名已经被注册使用了！")
+        return username

@@ -36,6 +36,4 @@ urlpatterns = [
     path('customer/delete/<int:pk>/', customer.customer_delete, name='customer_delete'),
 
 
-
-
 ]
