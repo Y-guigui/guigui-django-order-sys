@@ -85,6 +85,13 @@
             background-color: #e5e7eb !important;
             color: #111827 !important;
         }
+        /* ================= 分页器样式 ================= */
+        .pagination-container { display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px; }
+        .pagination { display: flex; list-style: none; padding: 0; margin: 0; gap: 8px; }
+        .pagination li a, .pagination li span { display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; font-size: 14px; font-weight: 500; color: #4b5563; background-color: #ffffff; border: 1px solid #e5e7eb; text-decoration: none; transition: all 0.2s ease; }
+        .pagination li a:hover { border-color: #667eea; color: #667eea; background-color: #f5f3ff; }
+        /* 当前激活的页码样式：紫蓝主题 */
+        .pagination li.active span { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25); }
     </style>
 
     <div class="container">
@@ -135,6 +142,27 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="pagination-container">
+            <ul class="pagination">
+                {% if queryset.has_previous %}
+                    <li><a href="?page=1">&laquo; 首页</a></li>
+                    <li><a href="?page={{ queryset.previous_page_number }}">上一页</a></li>
+                {% endif %}
+
+                {% for num in queryset.paginator.page_range %}
+                    {% if num == queryset.number %}
+                        <li class="active"><span>{{ num }}</span></li>
+                    {% elif num > queryset.number|add:'-3' and num < queryset.number|add:'3' %}
+                        <li><a href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if queryset.has_next %}
+                    <li><a href="?page={{ queryset.next_page_number }}">下一页</a></li>
+                    <li><a href="?page={{ queryset.paginator.num_pages }}">尾页 &raquo;</a></li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 

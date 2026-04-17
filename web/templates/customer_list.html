@@ -61,14 +61,88 @@
         .my-swal-confirm-btn:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 15px rgba(102, 126, 234, 0.35) !important; }
         .my-swal-cancel-btn { background-color: #f3f4f6 !important; color: #4b5563 !important; padding: 10px 24px !important; border-radius: 8px !important; font-size: 14px !important; font-weight: 600 !important; transition: all 0.3s ease !important; }
         .my-swal-cancel-btn:hover { background-color: #e5e7eb !important; color: #111827 !important; }
+        /* ================= 分页器样式 ================= */
+        .pagination-container { display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px; }
+        .pagination { display: flex; list-style: none; padding: 0; margin: 0; gap: 8px; }
+        .pagination li a, .pagination li span { display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 8px; font-size: 14px; font-weight: 500; color: #4b5563; background-color: #ffffff; border: 1px solid #e5e7eb; text-decoration: none; transition: all 0.2s ease; }
+        .pagination li a:hover { border-color: #667eea; color: #667eea; background-color: #f5f3ff; }
+        /* 当前激活的页码样式：紫蓝主题 */
+        .pagination li.active span { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25); }
+        /* ================= 全新质感搜索框 ================= */
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .search-form { margin: 0; }
+
+        /* 核心外壳：把输入框和按钮包在一个带圆角的边框里 */
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            overflow: hidden; /* 保证边缘不超出圆角 */
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 微弱的质感阴影 */
+        }
+
+        /* 当输入框获得焦点时，整个外壳亮起紫蓝色光晕 */
+        .search-input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        /* 放大镜图标放在输入框左侧内部 */
+        .search-icon {
+            color: #9ca3af;
+            padding-left: 14px;
+            font-size: 14px;
+        }
+
+        /* 真正的输入框取消边框，因为外壳已经有边框了 */
+        .search-input {
+            border: none;
+            padding: 9px 12px;
+            font-size: 14px;
+            outline: none;
+            width: 200px;
+            background-color: transparent;
+            color: #1f2937;
+        }
+
+        /* 搜索按钮加上左边框作为分割线 */
+        .btn-search {
+            background-color: #f9fafb;
+            border: none;
+            border-left: 1px solid #d1d5db;
+            padding: 9px 18px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 悬浮时融入你的紫蓝主题 */
+        .btn-search:hover {
+            background-color: #eef2ff;
+            color: #4f46e5;
+        }
     </style>
 
     <div class="container">
         <div class="page-header">
             <h2 class="page-title">客户列表</h2>
-            <a href="{% url 'customer_add' %}" class="btn-add">
-                <i class="fas fa-plus"></i> 新建客户
-            </a>
+            <div class="header-actions">
+                <form method="get" class="search-form">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="q" value="{{ keyword }}" placeholder="搜索用户名..." class="search-input">
+                        <button type="submit" class="btn-search">搜索</button>
+                    </div>
+                </form>
+                <a href="{% url 'customer_add' %}" class="btn-add">
+                    <i class="fas fa-plus"></i> 新建客户
+                </a>
+            </div>
         </div>
 
         <div class="card">
@@ -97,7 +171,7 @@
                         <td>{{ obj.creator.username }}</td>
 
                         <td class="action-btns">
-                            <a href="{% url 'customer_edit' pk=obj.id %}" class="btn-sm btn-edit">
+                            <a href="{% url 'customer_edit' pk=obj.id %}?page={{ queryset.number }}&q={{ keyword }}" class="btn-sm btn-edit">
                                 <i class="fas fa-edit"></i> 编辑
                             </a>
                             <a href="javascript:void(0);"
@@ -120,6 +194,27 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="pagination-container">
+            <ul class="pagination">
+                {% if queryset.has_previous %}
+                    <li><a href="?q={{ keyword }}&page=1">&laquo; 首页</a></li>
+                    <li><a href="?q={{ keyword }}&page={{ queryset.previous_page_number }}">上一页</a></li>
+                {% endif %}
+
+                {% for num in queryset.paginator.page_range %}
+                    {% if num == queryset.number %}
+                        <li class="active"><span>{{ num }}</span></li>
+                    {% elif num > queryset.number|add:'-3' and num < queryset.number|add:'3' %}
+                        <li><a href="?q={{ keyword }}&page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if queryset.has_next %}
+                    <li><a href="?q={{ keyword }}&page={{ queryset.next_page_number }}">下一页</a></li>
+                    <li><a href="?q={{ keyword }}&page={{ queryset.paginator.num_pages }}">尾页 &raquo;</a></li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 

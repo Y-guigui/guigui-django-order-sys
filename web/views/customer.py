@@ -5,12 +5,36 @@ from web import models
 from utils.encrypt import md5
 from django.shortcuts import render, redirect
 from .forms import CustomerForm, CustomerEditForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def customer_list(request):
-    # 1. 从数据库中获取所有级别数据   连表查询
-    queryset = models.Customer.objects.filter(active=1).select_related('level', 'creator')
-    # 2. 渲染模板，并将数据传过去
-    return render(request, 'customer_list.html', {'queryset': queryset})
+    # 获取前端传过来的搜索关键字 (默认是个空字符串)
+    keyword = request.GET.get('q', '')
+    query_dict = {'active': 1}
+    # 如果用户输入了关键字，用户名模糊搜索条件
+    if keyword:
+        # __contains 就等价于 SQL 里面的 LIKE '%keyword%'
+        query_dict['username__contains'] = keyword
+
+    # 查数据库，并排序
+    data_list = models.Customer.objects.filter(**query_dict).select_related('level', 'creator').order_by('id')
+    # 实例化分类器paginator
+    paginator = Paginator(data_list, 8)
+    # 从 URL 提取用户想看的页码，默认看第 1 页
+    page = request.GET.get('page',1)
+    try:
+        queryset = paginator.page(page)
+    except PageNotAnInteger:
+        # 如果用户输入的页码不是数字，就让他看第 1 页
+        queryset = paginator.page(1)
+    except EmptyPage:
+        # 如果用户输入的页码太大了，就让他看最后一页
+        queryset = paginator.page(paginator.num_pages)
+
+    return render(request, 'customer_list.html', {
+        'queryset': queryset,
+        'keyword': keyword
+    })
 
 
 def customer_add(request):
@@ -35,21 +59,24 @@ def customer_add(request):
 
 
 def customer_edit(request, pk):
-    inistance = models.Customer.objects.filter(id=pk, active=1).first()
+    instance = models.Customer.objects.filter(id=pk, active=1).first()
+    if not instance:
+        return redirect('customer_list')
+
+    page = request.GET.get('page', '')
+    q = request.GET.get('q', '')
 
     if request.method == 'GET':
-        form = CustomerEditForm(instance=inistance)
+        form = CustomerEditForm(instance=instance)
         return render(request, 'customer_edit.html', {'form':form})
-        return render(request, 'customer_list.html', {'form':form})
 
     if request.method == 'POST':
-        form = CustomerEditForm(data=request.POST, instance=inistance)
+        form = CustomerEditForm(data=request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            return redirect('customer_list')
+            return redirect(f'/customer/list/?page={page}&q={q}')
+
         return render(request, 'customer_edit.html', {'form':form})
-
-
 
 def customer_delete(request, pk):
     """

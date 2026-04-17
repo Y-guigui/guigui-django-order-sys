@@ -2,12 +2,21 @@ from django.shortcuts import render, redirect
 from web import models
 from .forms import LevelModelForm
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def level_list(request):
-    # 1. 从数据库中获取所有级别数据
-    queryset = models.Level.objects.filter(active=1)
-    # 2. 渲染模板，并将数据传过去
+
+    data_list = models.Level.objects.filter(active=1).order_by('id')
+    paginator = Paginator(data_list, 8)
+    page_number = request.GET.get('page',1)
+    try:
+        queryset = paginator.page(page_number)
+    except PageNotAnInteger:
+        queryset = paginator.page(1)
+    except EmptyPage:
+        queryset = paginator.page(paginator.num_pages)
+
     return render(request, 'level_list.html', {'queryset': queryset})
 
 
