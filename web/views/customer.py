@@ -148,15 +148,25 @@ def customer_charge_add(request, pk):
             })
 
         with transaction.atomic():
+            # 在事务内重新获取对象并加锁 (FOR UPDATE)
+            locked_customer = models.Customer.objects.select_for_update().filter(id=pk).first()
+            # 二次检查
+            if change_type == 2 and amount > locked_customer.balance:
+                form.add_error('amount',
+                               f'网络拥挤！该账户余额刚刚发生了变动，最新余额为{locked_customer.balance}，无法扣款！')
+                return render(request, 'customer_charge_add.html', {
+                    'form': form,
+                    'customer_object': locked_customer
+                })
             # 补全字段，上面只是有'change_type'/'amount'/'memo'/'creator'
             instance = form.save(commit=False)
-            instance.customer = customer_object
+            instance.customer = locked_customer
             instance.save()  # 存入交易记录表
             if change_type == 1:# 充值
-                customer_object.balance += amount
+                locked_customer.balance += amount
             else: # 扣款
-                customer_object.balance -= amount
-            customer_object.save()  # 存入客户表
+                locked_customer.balance -= amount
+            locked_customer.save()  # 存入客户表
         # 成功后跳转回流水列表页
         return redirect('customer_charge', pk=pk)
 
