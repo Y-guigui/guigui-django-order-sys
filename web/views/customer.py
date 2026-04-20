@@ -136,16 +136,22 @@ def customer_charge_add(request, pk):
 
     form = ChargeModelForm(data=request.POST)
     if form.is_valid():
+        # 客户表
+        amount = form.cleaned_data.get('amount')
+        change_type = form.cleaned_data.get('change_type')
+
+        if change_type == 2 and amount > customer_object.balance:
+            form.add_error('amount', '账户余额不足,余额为{}，无法完成扣款！'.format(customer_object.balance))
+            return render(request, 'customer_charge_add.html', {
+                'form': form,
+                'customer_object': customer_object
+            })
+
         with transaction.atomic():
             # 补全字段，上面只是有'change_type'/'amount'/'memo'/'creator'
             instance = form.save(commit=False)
             instance.customer = customer_object
             instance.save()  # 存入交易记录表
-
-            # 客户表
-            amount = form.cleaned_data.get('amount')
-            change_type = form.cleaned_data.get('change_type')
-
             if change_type == 1:# 充值
                 customer_object.balance += amount
             else: # 扣款
