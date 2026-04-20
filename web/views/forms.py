@@ -210,3 +210,32 @@ class PolicyModelForm(forms.ModelForm):
             raise ValidationError("该数量的价格策略已存在，请换一个数量！")
         return count
 
+class ChargeModelForm(forms.ModelForm):
+    class Meta:
+        model = models.TransactionRecord
+        fields = ['change_type', 'creator','amount', 'memo']
+
+        widgets = {
+            'change_type': forms.Select(attrs={'class': 'form-control'}),
+            'creator': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '请输入金额', 'step': '0.01'}),
+            'memo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': '请输入备注信息', 'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 只保留 (1, '充值') 和 (2, '扣款')
+        self.fields['change_type'].choices = [
+            (1, '充值'),
+            (2, '扣款')
+        ]
+        self.fields['creator'].choices = models.Administrator.objects.filter(active=1).values_list('id','username')
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+
+        if amount is not None:
+            if amount <= 0 :
+                # 核心：抛出验证错误！这句话会自动塞进 form.percent.errors 里
+                raise ValidationError("金额必须大于0")
+        return amount

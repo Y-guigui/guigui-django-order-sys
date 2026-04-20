@@ -1,10 +1,12 @@
 import re
 import random
+
+from django.db import transaction
 from django.http import JsonResponse
 from web import models
 from utils.encrypt import md5
 from django.shortcuts import render, redirect
-from .forms import CustomerForm, CustomerEditForm
+from .forms import CustomerForm, CustomerEditForm, ChargeModelForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def customer_list(request):
@@ -88,3 +90,72 @@ def customer_delete(request, pk):
 
     # 返回成功的 JSON，前端的 SweetAlert 收到 True 就会弹出绿勾并刷新页面
     return JsonResponse({"status": True})
+
+
+def customer_charge(request, pk):
+    """
+    某客户的交易记录列表
+    """
+    # 验证客户active=1
+    customer_object = models.Customer.objects.filter(id=pk, active=1).first()
+    if not customer_object:
+        return redirect('customer_list')
+    # 记录
+    data_list = models.TransactionRecord.objects.filter(customer_id=pk, active=1).order_by('-id')
+
+    paginator = Paginator(data_list, 8)
+    page = request.GET.get('page', 1)
+    try:
+        queryset = paginator.page(page)
+    except PageNotAnInteger:
+        queryset = paginator.page(1)
+    except EmptyPage:
+        queryset = paginator.page(paginator.num_pages)
+
+    return render(request, 'customer_charge.html', {
+        'customer_object': customer_object,
+        'queryset': queryset
+    })
+
+def customer_charge_add(request, pk):
+    """
+    新建交易记录（充值/扣款）
+    :param request:
+    :param pk:
+    :return:
+    """
+    customer_object= models.Customer.objects.filter(id=pk, active=1).first()
+    if not customer_object:
+        return redirect('customer_list')
+    if request.method == 'GET':
+        form = ChargeModelForm()
+        return render(request, 'customer_charge_add.html', {
+            'form':form,
+            'customer_object':customer_object
+        })
+
+    form = ChargeModelForm(data=request.POST)
+    if form.is_valid():
+        with transaction.atomic():
+            # 补全字段，上面只是有'change_type'/'amount'/'memo'/'creator'
+            instance = form.save(commit=False)
+            instance.customer = customer_object
+            instance.save()  # 存入交易记录表
+
+            # 客户表
+            amount = form.cleaned_data.get('amount')
+            change_type = form.cleaned_data.get('change_type')
+
+            if change_type == 1:# 充值
+                customer_object.balance += amount
+            else: # 扣款
+                customer_object.balance -= amount
+            customer_object.save()  # 存入客户表
+        # 成功后跳转回流水列表页
+        return redirect('customer_charge', pk=pk)
+
+    return render(request, 'customer_charge_add.html', {
+        'form': form,
+        'customer_object': customer_object
+    })
+

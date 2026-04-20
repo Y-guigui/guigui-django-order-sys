@@ -34,6 +34,8 @@ urlpatterns = [
     path('customer/add/', customer.customer_add, name='customer_add'),
     path('customer/edit/<int:pk>/', customer.customer_edit, name='customer_edit'),
     path('customer/delete/<int:pk>/', customer.customer_delete, name='customer_delete'),
+    path('customer/charge/<int:pk>/', customer.customer_charge, name='customer_charge'),
+    path('customer/charge/add/<int:pk>/', customer.customer_charge_add, name='customer_charge_add'),
 
     path('policy/list/', policy.policy_list, name='policy_list'),
     path('policy/add/', policy.policy_add, name='policy_add'),

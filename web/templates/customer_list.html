@@ -26,7 +26,7 @@
 
         /* ================= 操作按钮样式 ================= */
         .action-btns { display: flex; gap: 12px; }
-        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: none; cursor: pointer; }
+        .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: none; cursor: pointer; white-space: nowrap;}
 
         /* 编辑按钮：浅蓝底 + 深蓝字 */
         .btn-edit { color: #2563eb; background-color: #eff6ff; }
@@ -111,6 +111,10 @@
             background-color: #eef2ff;
             color: #4f46e5;
         }
+
+        /* 交易记录按钮：浅绿底 + 深绿字 */
+        .btn-charge { color: #059669; background-color: #ecfdf5; }
+        .btn-charge:hover { background-color: #d1fae5; }
     </style>
 
     <div class="container">
@@ -141,7 +145,7 @@
                         <th>级别</th>
                         <th>注册时间</th>
                         <th>创建者</th>
-                        <th style="width: 200px;">操作</th>
+                        <th style="width: 280px;">操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -156,6 +160,9 @@
                         <td>{{ obj.creator.username }}</td>
 
                         <td class="action-btns">
+                            <a href="{% url 'customer_charge' pk=obj.id %}" class="btn-sm btn-charge">
+                                <i class="fas fa-file-invoice-dollar"></i> 交易记录
+                            </a>
                             <a href="{% url 'customer_edit' pk=obj.id %}?page={{ queryset.number }}&q={{ keyword }}" class="btn-sm btn-edit">
                                 <i class="fas fa-edit"></i> 编辑
                             </a>

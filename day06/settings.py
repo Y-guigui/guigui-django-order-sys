@@ -186,10 +186,13 @@ NB_PERMISSION = {
         "customer_add":"用户添加",
         "customer_edit":"用户编辑",
         "customer_delete":"用户删除",
+        "customer_charge":"用户交易信息",
+        "customer_charge_add":"用户交易信息添加",
         "policy_list":"价格策略列表",
         "policy_add":"价格策略添加",
         "policy_delete":"价格策略删除",
         "policy_edit":"价格策略编辑",
+
 
     },
     "CUSTOMER": {
