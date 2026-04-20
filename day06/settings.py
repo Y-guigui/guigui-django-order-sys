@@ -197,6 +197,8 @@ NB_PERMISSION = {
     },
     "CUSTOMER": {
         "level_list": "级别列表",
+        "my_order_list":"我的订单",
+        "my_order_list_add":"下单"
 
     }
 }
@@ -212,7 +214,7 @@ NB_MENU = {
         {"text": "价格策略", "url": "/policy/list/", "icon": "fas fa-clipboard-list"},
     ],
     "CUSTOMER": [
-        {"text": "我的订单", "url": "/xxx/xx/", "icon": "fas fa-shopping-cart"},
+        {"text": "我的订单", "url": "/my/order/list/", "icon": "fas fa-shopping-cart"},
         {"text": "账户流水", "url": "/xxx/xx/", "icon": "fas fa-wallet"},
     ]
 }

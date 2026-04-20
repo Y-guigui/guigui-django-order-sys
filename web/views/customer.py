@@ -1,10 +1,6 @@
-import re
-import random
-
 from django.db import transaction
 from django.http import JsonResponse
 from web import models
-from utils.encrypt import md5
 from django.shortcuts import render, redirect
 from .forms import CustomerForm, CustomerEditForm, ChargeModelForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -15,7 +11,7 @@ def customer_list(request):
     query_dict = {'active': 1}
     # 如果用户输入了关键字，用户名模糊搜索条件
     if keyword:
-        # __contains 就等价于 SQL 里面的 LIKE '%keyword%'
+        # __contains 等价于 SQL 里面的 LIKE '%keyword%'
         query_dict['username__contains'] = keyword
 
     # 查数据库，并排序
@@ -167,6 +163,7 @@ def customer_charge_add(request, pk):
             else: # 扣款
                 locked_customer.balance -= amount
             locked_customer.save()  # 存入客户表
+
         # 成功后跳转回流水列表页
         return redirect('customer_charge', pk=pk)
 

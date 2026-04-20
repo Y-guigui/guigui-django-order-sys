@@ -239,3 +239,38 @@ class ChargeModelForm(forms.ModelForm):
                 # 核心：抛出验证错误！这句话会自动塞进 form.percent.errors 里
                 raise ValidationError("金额必须大于0")
         return amount
+
+class MyOrderModelForm(forms.ModelForm):
+    class Meta:
+        model = models.Order
+        fields = ['url', 'count']
+        # 同样，为了保持我们高级的 UI 风格，注入 CSS 样式
+        widgets = {
+            'url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '请输入需要推广的视频链接'}),
+            'count': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '请输入需要增加的播放量'}),
+        }
+        # 自定义中文报错信息
+        error_messages = {
+            'title': {
+                'required': '视频链接不能为空',
+            },
+            'percent': {
+                'required': '播放量不能为空',
+            }
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 查找价格策略并排序
+        policy_queryset = models.PricePolicy.objects.all().order_by('count')
+        # 动态拼接提示语
+        help_text_list = []
+        for obj in policy_queryset:
+            # 加几个空格，让排版对齐更好看一点
+            help_text_list.append(f"&nbsp;&nbsp;• 数量 &ge; {obj.count} ➜ ¥{obj.price/obj.count}/条")
+
+        if help_text_list:
+            policy_str = "<br>".join(help_text_list)
+            self.fields['count'].help_text = f"【价格策略】<br>{policy_str}"
+        else:
+            self.fields['count'].help_text = "暂无价格策略，请联系管理员配置"

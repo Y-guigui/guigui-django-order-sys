@@ -15,7 +15,7 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path
-from web.views import account, level, customer, policy
+from web.views import account, level, customer, policy, my_order
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -41,5 +41,8 @@ urlpatterns = [
     path('policy/add/', policy.policy_add, name='policy_add'),
     path('policy/edit/<int:pk>/', policy.policy_edit, name='policy_edit'),
     path('policy/delete/<int:pk>/', policy.policy_delete, name='policy_delete'),
+
+    path('my/order/list/', my_order.my_order_list, name='my_order_list'),
+    path('my/order/list/add', my_order.my_order_list_add, name='my_order_list_add'),
 
 ]

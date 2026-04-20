@@ -10,7 +10,6 @@ def level_list(request):
     q = request.GET.get('q','')
     query_dict = {'active':1}
     if q:
-        # 假设你的级别名称字段叫 title，如果是其他名字请替换
         query_dict['title__contains'] = q
 
     data_list = models.Level.objects.filter(**query_dict).order_by('id')
