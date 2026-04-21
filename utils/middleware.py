@@ -31,7 +31,7 @@ class AuthMiddleware(MiddlewareMixin):
         权限校验 & 动态菜单准备
         Django 路由匹配成功后，执行视图函数之前，会触发这里。
         """
-        # 检查白名单：和第一道门一样，白名单直接放行
+        # 检查白名单
         current_path = request.path_info
         if current_path in settings.NB_WHITE_URL:
             return None
@@ -49,7 +49,6 @@ class AuthMiddleware(MiddlewareMixin):
         )
 
         # 获取当前访问路由的名字 (name属性)
-        # 例如你访问 /level/list/，这里就能拿到 "level_list"
         url_name = request.resolver_match.url_name
 
         # --- 核心权限校验逻辑 ---
@@ -65,19 +64,13 @@ class AuthMiddleware(MiddlewareMixin):
             return render(request, 'no_permission.html', {"msg": "您没有权限访问此页面"})
 
         # --- 核心动态菜单逻辑 ---
-
-        # 计算高亮菜单 (menu_name)
-        # 大部分情况下，你访问的页面的 url_name 就是菜单的高亮依据
-        # 假设你正在访问 'level_list'，那么左侧菜单里 url='/level/list/' 的项就应该高亮
+        # 高亮显示
         user_obj.menu_name = url_name
 
         # 计算面包屑导航 (text_list)
-        # 根据你的权限字典，拿到当前页面的中文名称
         page_title = role_permissions.get(url_name)
         user_obj.text_list = ["首页", page_title]
 
-
-        # 让 Django 去执行真正的 views 函数
         return None
 
 

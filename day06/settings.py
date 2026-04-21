@@ -198,7 +198,8 @@ NB_PERMISSION = {
     "CUSTOMER": {
         "level_list": "级别列表",
         "my_order_list":"我的订单",
-        "my_order_list_add":"下单"
+        "my_order_add":"下单",
+        "my_order_cancel":"撤单",
 
     }
 }

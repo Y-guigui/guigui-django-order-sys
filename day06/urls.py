@@ -43,6 +43,7 @@ urlpatterns = [
     path('policy/delete/<int:pk>/', policy.policy_delete, name='policy_delete'),
 
     path('my/order/list/', my_order.my_order_list, name='my_order_list'),
-    path('my/order/list/add', my_order.my_order_list_add, name='my_order_list_add'),
+    path('my/order/add/', my_order.my_order_add, name='my_order_add'),
+    path('my/order/cancel/<int:pk>/', my_order.my_order_cancel, name='my_order_cancel'),
 
 ]
