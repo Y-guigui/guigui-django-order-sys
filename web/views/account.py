@@ -41,7 +41,7 @@ def login(request):
                 'name': user_object.username,
                 'id': user_object.id
             }
-            return redirect("/level/list/")
+            return redirect("/index/")
 
         # 校验失败：查无此人或密码错误。通过 add_error 附加一个全局错误
         form.add_error(None, "用户名或密码错误")
