@@ -70,6 +70,7 @@ class Order(ActiveBaseModel):
         (2, "正在执行"),
         (3, "已完成"),
         (4, "失败"),
+        (5, "已撤销"),
     )
     status = models.SmallIntegerField(verbose_name="状态", choices=status_choices, default=1)
     oid = models.CharField(verbose_name="订单号", max_length=64, unique=True)

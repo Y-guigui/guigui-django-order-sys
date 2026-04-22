@@ -15,10 +15,10 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path
-from web.views import account, level, customer, policy, my_order
+from web.views import account, level, customer, policy, my_order, order
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('index/', account.index, name='index'),
     path('login/', account.login, name='login'),
     path('sms/login/', account.sms_login, name='sms_login'),
     path('sms/send/', account.sms_send, name='sms_send'),
@@ -45,5 +45,8 @@ urlpatterns = [
     path('my/order/list/', my_order.my_order_list, name='my_order_list'),
     path('my/order/add/', my_order.my_order_add, name='my_order_add'),
     path('my/order/cancel/<int:pk>/', my_order.my_order_cancel, name='my_order_cancel'),
+    path('my/order/delete/<int:pk>/', my_order.my_order_delete, name='my_order_delete'),
+
+    path('order/list/', order.order_list, name='order_list'),
 
 ]

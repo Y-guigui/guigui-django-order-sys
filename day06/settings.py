@@ -163,7 +163,7 @@ SESSION_CACHE_ALIAS = 'default'
 # =========================================================
 
 # 1. 登录成功后的默认跳转主页
-LOGIN_HOME = "/level/list/"
+LOGIN_HOME = "/index/"
 
 # 2. 之前我们在登录视图存入 Session 的键名 (保持一致)
 NB_SESSION_KEY = "user_info"
@@ -178,6 +178,7 @@ NB_WHITE_URL = ['/login/', '/sms/login/', '/sms/send/']
 # 这里的 "level_list", "level_add" 等必须和你 urls.py 里面的 name="xxx" 对应！
 NB_PERMISSION = {
     "ADMIN": {
+        "index":"后台首页",
         "level_list": "级别列表",
         "level_add": "级别添加",
         "level_edit": "级别编辑",
@@ -192,14 +193,17 @@ NB_PERMISSION = {
         "policy_add":"价格策略添加",
         "policy_delete":"价格策略删除",
         "policy_edit":"价格策略编辑",
+        "order_list": "全站订单"
 
 
     },
     "CUSTOMER": {
+        "index": "后台首页",
         "level_list": "级别列表",
         "my_order_list":"我的订单",
         "my_order_add":"下单",
         "my_order_cancel":"撤单",
+        "my_order_delete":"删除订单",
 
     }
 }
@@ -207,12 +211,10 @@ NB_PERMISSION = {
 # 6. 动态菜单字典：不同角色登录后，左侧显示的菜单结构
 NB_MENU = {
     "ADMIN": [
-        # 给级别管理配一个皇冠图标
         {"text": "级别管理", "url": "/level/list/", "icon": "fas fa-crown"},
-        # 给用户管理配一个人群图标
         {"text": "用户管理", "url": "/customer/list/", "icon": "fas fa-users"},
-        # 给订单管理配一个清单图标
         {"text": "价格策略", "url": "/policy/list/", "icon": "fas fa-clipboard-list"},
+        {"text": "全站订单", "url": "/order/list/", "icon": "fas fa-shopping-bag"},
     ],
     "CUSTOMER": [
         {"text": "我的订单", "url": "/my/order/list/", "icon": "fas fa-shopping-cart"},

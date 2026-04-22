@@ -130,3 +130,13 @@ def sms_send(request):
 
     # 5. 告诉前端：发送成功！
     return JsonResponse({'status': True, 'msg': '验证码发送成功'})
+
+
+def index(request):
+    """
+    统一的登录后欢迎主页
+    """
+    # 从 session 里把当前登录人的信息拿出来，传给前端
+    user_info = request.session.get('user_info')
+
+    return render(request, 'index.html', {'user_info': user_info})
